@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק החיים האינסופי שלי</title>
+    <style>
+        /* עיצוב נקי ומודרני למסך המלא */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #111116;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* מסך הפתיחה עם כפתור גדול */
+        #welcome-screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, #1a1a2e 0%, #0f0f1a 100%);
+            z-index: 10;
+            transition: opacity 0.8s ease-out, visibility 0.8s;
+        }
+
+        /* כותרת האתר */
+        .game-title {
+            color: #deff9a;
+            font-size: 3.5rem;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px rgba(222, 255, 154, 0.3);
+            text-align: center;
+            font-weight: 700;
+        }
+
+        /* כפתור התחל משחק ענק */
+        .start-btn {
+            padding: 25px 60px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #0f0f1a;
+            background-color: #deff9a;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(222, 255, 154, 0.4);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(222, 255, 154, 0.6);
+        }
+
+        /* מיכל המשחק - מתחיל קטן ומוסתר */
+        #game-container {
+            width: 10px;
+            height: 10px;
+            opacity: 0;
+            transform: scale(0.1);
+            transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1), width 1.2s ease, height 1.2s ease, opacity 0.5s ease;
+            background: #000;
+        }
+
+        /* הגדלה אוטומטית למסך מלא בלחיצה */
+        #game-container.fullscreen {
+            width: 100vw;
+            height: 100vh;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        #unity-canvas {
+            width: 100% !important;
+            height: 100% !important;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="welcome-screen">
+        <div class="game-title">משחק החיים האינסופי</div>
+        <button class="start-btn" onclick="launchGame()">התחל משחק</button>
+    </div>
+
+    <div id="game-container">
+        <canvas id="unity-canvas"></canvas>
+    </div>
+
+    <script>
+        function launchGame() {
+            const welcomeScreen = document.getElementById('welcome-screen');
+            const gameContainer = document.getElementById('game-container');
+
+            // הפעלת האנימציה של הגדלת המסך והעלמת הכפתור
+            welcomeScreen.style.opacity = '0';
+            welcomeScreen.style.visibility = 'hidden';
+            gameContainer.classList.add('fullscreen');
+
+            // =======================================================
+            // איפה שמים את הקונפיג? בדיוק כאן למטה!
+            // תחליף את הבלוק הזה בקונפיג המדויק שיוניטי יצרה בשבילך קודם
+            // =======================================================
+            
+      var config = {
+        arguments: [],
+        dataUrl: buildUrl + "/GameOfLifeWebsite.data.br",
+        frameworkUrl: buildUrl + "/GameOfLifeWebsite.framework.js.br",
+        codeUrl: buildUrl + "/GameOfLifeWebsite.wasm.br",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "DefaultCompany",
+        productName: "MyGameOfLife",
+        productVersion: "0.1.0",
+        showBanner: unityShowBanner,
+        // errorHandler: function(err, url, line) {
+        //    alert("error " + err + " occurred at line " + line);
+        //    // Return 'true' if you handled this error and don't want Unity
+        //    // to process it further, 'false' otherwise.
+        //    return true;
+        // },
+      };
+
+            // =======================================================
+            // סוף אזור הקונפיג
+            // =======================================================
+
+            // טעינת מנוע יוניטי 6 אל תוך האתר
+            const script = document.createElement("script");
+            script.src = "Build/Build.loader.js"; // ביוניטי 6 זה בדרך כלל השם, ודא שקיים קובץ כזה בתיקיית Build
+            
+            script.onload = () => {
+                createUnityInstance(document.getElementById("unity-canvas"), config, (progress) => {
+                    // מד טעינה פנימי במידת הצורך
+                }).then((unityInstance) => {
+                    console.log("המשחק עלה למסך מלא בהצלחה!");
+                }).catch((message) => {
+                    console.error("שגיאה בטעינת יוניטי: " + message);
+                });
+            };
+            
+            document.body.appendChild(script);
+        }
+    </script>
+</body>
+</html>
